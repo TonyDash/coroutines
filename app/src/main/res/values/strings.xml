@@ -2,6 +2,7 @@
     <string name="app_name">coroutines</string>
     <string name="runNormal">runNormal</string>
     <string name="runKt">runKt</string>
+    <string name="runRx">runRx</string>
     <string name="baseIntroduce">基础介绍</string>
     <string name="networkRequest">网络请求</string>
 </resources>

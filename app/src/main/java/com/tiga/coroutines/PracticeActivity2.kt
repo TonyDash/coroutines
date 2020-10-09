@@ -15,6 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.Exception
 import javax.net.ssl.TrustManagerFactory
 
 class PracticeActivity2 : AppCompatActivity() {
@@ -54,10 +55,18 @@ class PracticeActivity2 : AppCompatActivity() {
     private fun requestByKt() {
         if (::retrofit.isInitialized && ::api.isInitialized) {
             GlobalScope.launch(Dispatchers.Main) {
-                val repos = api.listReposKt("TonyDash")
-                textView.text ="KT${repos[0].name}"
+                try {
+                    val repos = api.listReposKt("TonyDash")
+                    textView.text = "KT${repos[0].name}"
+                } catch (e: Exception) {
+                    textView.text = e.message ?: "error"
+                }
             }
         }
+    }
+
+    private fun requestByRx(){
+
     }
 
     private fun requestByNormal() {
