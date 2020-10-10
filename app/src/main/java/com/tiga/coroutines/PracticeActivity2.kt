@@ -10,10 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_practice2.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,6 +24,8 @@ class PracticeActivity2 : AppCompatActivity() {
 
     private lateinit var retrofit: Retrofit
     private lateinit var api: GitHubApi
+    private lateinit var jobKt:Job
+    private lateinit var jobKtAsync:Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +65,7 @@ class PracticeActivity2 : AppCompatActivity() {
 
     private fun requestByKt() {
         if (::retrofit.isInitialized && ::api.isInitialized) {
-            GlobalScope.launch(Dispatchers.Main) {
+            jobKt = GlobalScope.launch(Dispatchers.Main) {
                 try {
                     val repos = api.listReposKt("TonyDash")
                     textView.text = "KT${repos[0].name}"
@@ -79,7 +78,7 @@ class PracticeActivity2 : AppCompatActivity() {
 
     private fun requestByKtAsync(){
         if (::retrofit.isInitialized && ::api.isInitialized) {
-            GlobalScope.launch(Dispatchers.Main) {
+            jobKtAsync = GlobalScope.launch(Dispatchers.Main) {
                 try {
                     val async1 = async { api.listReposKt("TonyDash") }
                     val async2 = async { api.listReposKt("TonyDash") }
@@ -127,6 +126,16 @@ class PracticeActivity2 : AppCompatActivity() {
                     }
 
                 })
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::jobKt.isInitialized){
+            jobKt.cancel()
+        }
+        if (::jobKtAsync.isInitialized){
+            jobKtAsync.cancel()
         }
     }
 }
