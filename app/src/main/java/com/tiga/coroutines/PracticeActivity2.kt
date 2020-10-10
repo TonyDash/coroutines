@@ -12,6 +12,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_practice2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -21,7 +22,6 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
-import javax.net.ssl.TrustManagerFactory
 
 class PracticeActivity2 : AppCompatActivity() {
 
@@ -44,6 +44,9 @@ class PracticeActivity2 : AppCompatActivity() {
         }
         btnRunRx.setOnClickListener {
             requestByRx()
+        }
+        btnRunRxAsync.setOnClickListener {
+            requestByKtAsync()
         }
     }
 
@@ -74,6 +77,20 @@ class PracticeActivity2 : AppCompatActivity() {
         }
     }
 
+    private fun requestByKtAsync(){
+        if (::retrofit.isInitialized && ::api.isInitialized) {
+            GlobalScope.launch(Dispatchers.Main) {
+                try {
+                    val async1 = async { api.listReposKt("TonyDash") }
+                    val async2 = async { api.listReposKt("TonyDash") }
+                    textView.text = "${async1.await()[0].name} requestByKtAsync ${async2.await()[0].name}"
+                }catch (e:Exception){
+                    textView.text = e.message ?: "error"
+                }
+            }
+        }
+    }
+
     private fun requestByRx() {
         if (::retrofit.isInitialized && ::api.isInitialized) {
             api.listReposRx("TonyDash")
@@ -88,7 +105,7 @@ class PracticeActivity2 : AppCompatActivity() {
                     }
 
                     override fun onError(e: Throwable) {
-                        textView.text = e.message?:"onError"
+                        textView.text = e.message ?: "onError"
                     }
                 })
         }
