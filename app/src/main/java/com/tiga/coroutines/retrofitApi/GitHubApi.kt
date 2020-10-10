@@ -8,9 +8,9 @@ import retrofit2.http.Path
 
 interface GitHubApi {
     @GET("users/{user}/repos")
-    fun listRepos(@Path("user")user:String):Call<List<Repo>>
+    fun listRepos(@Path("user")user:String): Call<List<Repo>>
     @GET("users/{user}/repos")
     suspend fun listReposKt(@Path("user")user:String):List<Repo>
     @GET("users/{user}/repos")
-    suspend fun listReposRx(@Path("user")user:String):Single<List<Repo>>
+    fun listReposRx(@Path("user")user:String): Single<List<Repo>>
 }

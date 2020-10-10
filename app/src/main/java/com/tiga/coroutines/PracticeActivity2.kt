@@ -5,6 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.tiga.coroutines.entity.Repo
 import com.tiga.coroutines.retrofitApi.GitHubApi
 import com.tiga.coroutines.ssl.TrustAllSSLSocketFactory
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_practice2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -14,6 +18,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 import javax.net.ssl.TrustManagerFactory
@@ -37,6 +42,9 @@ class PracticeActivity2 : AppCompatActivity() {
         btnRunKt.setOnClickListener {
             requestByKt()
         }
+        btnRunRx.setOnClickListener {
+            requestByRx()
+        }
     }
 
     private fun initRetrofit() {
@@ -48,6 +56,7 @@ class PracticeActivity2 : AppCompatActivity() {
             .baseUrl("https://api.github.com/")
             .client(okHttpClient.build())
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))//使用rxjava是加上这一句
             .build()
         api = retrofit.create(GitHubApi::class.java)
     }
@@ -65,8 +74,24 @@ class PracticeActivity2 : AppCompatActivity() {
         }
     }
 
-    private fun requestByRx(){
+    private fun requestByRx() {
+        if (::retrofit.isInitialized && ::api.isInitialized) {
+            api.listReposRx("TonyDash")
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : SingleObserver<List<Repo>> {
+                    override fun onSuccess(t: List<Repo>) {
+                        textView.text = "Rx${t[0].name}"
+                    }
 
+                    override fun onSubscribe(d: Disposable) {
+                        textView.text = "onSubscribe"
+                    }
+
+                    override fun onError(e: Throwable) {
+                        textView.text = e.message?:"onError"
+                    }
+                })
+        }
     }
 
     private fun requestByNormal() {
