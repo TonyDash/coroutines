@@ -2,6 +2,7 @@ package com.tiga.coroutines
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.tiga.coroutines.entity.Repo
 import com.tiga.coroutines.retrofitApi.GitHubApi
 import com.tiga.coroutines.ssl.TrustAllSSLSocketFactory
@@ -24,8 +25,6 @@ class PracticeActivity2 : AppCompatActivity() {
 
     private lateinit var retrofit: Retrofit
     private lateinit var api: GitHubApi
-    private lateinit var jobKt:Job
-    private lateinit var jobKtAsync:Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +64,7 @@ class PracticeActivity2 : AppCompatActivity() {
 
     private fun requestByKt() {
         if (::retrofit.isInitialized && ::api.isInitialized) {
-            jobKt = GlobalScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Main) {
                 try {
                     val repos = api.listReposKt("TonyDash")
                     textView.text = "KT${repos[0].name}"
@@ -78,7 +77,7 @@ class PracticeActivity2 : AppCompatActivity() {
 
     private fun requestByKtAsync(){
         if (::retrofit.isInitialized && ::api.isInitialized) {
-            jobKtAsync = GlobalScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Main) {
                 try {
                     val async1 = async { api.listReposKt("TonyDash") }
                     val async2 = async { api.listReposKt("TonyDash") }
@@ -131,11 +130,5 @@ class PracticeActivity2 : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::jobKt.isInitialized){
-            jobKt.cancel()
-        }
-        if (::jobKtAsync.isInitialized){
-            jobKtAsync.cancel()
-        }
     }
 }

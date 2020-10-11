@@ -5,6 +5,7 @@ buildscript {
         retrofit_version = '2.6.0'
         rxjava_version = '2.2.19'
         rxandroid_version = '2.1.1'
+        lifecycle_version = '2.2.0'
     }
     repositories {
         google()
